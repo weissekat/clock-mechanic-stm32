@@ -6,32 +6,20 @@ void RTC_IRQHandler(void)
     if ((RTC->ISR & (RTC_ISR_ALRAF)) == (RTC_ISR_ALRAF))
     {
         RTC->ISR &= ~RTC_ISR_ALRAF;
-        
         EXTI->PR |= EXTI_PR_PR17;
         
-        GPIOB->ODR ^= GPIO_ODR_13;
-        
-        if ((GPIOB->ODR & (GPIO_ODR_3)) == (GPIO_ODR_3))
+        if (((GPIOB->ODR & GPIO_ODR_3) == GPIO_ODR_3) & ((GPIOB->ODR & GPIO_ODR_4) == GPIO_ODR_4))
         {
             GPIOB->ODR &= ~GPIO_ODR_3;
-            GPIOB->ODR |= GPIO_ODR_4;
             for (i = 0; i <= 10000; i++ ) { __NOP(); };
-            
-            return;
-        }
-        
-        if ((GPIOB->ODR & (GPIO_ODR_4)) == (GPIO_ODR_4))
-        {
             GPIOB->ODR &= ~GPIO_ODR_4;
+        }
+        else
+        {
             GPIOB->ODR |= GPIO_ODR_3;
             for (i = 0; i <= 10000; i++ ) { __NOP(); };
-            
-            return;
+            GPIOB->ODR |= GPIO_ODR_4;
         }
-        
-        // fail!
-        GPIOB->ODR |= GPIO_ODR_3;
-        GPIOB->ODR &= ~GPIO_ODR_4;               
     }
 }
 
