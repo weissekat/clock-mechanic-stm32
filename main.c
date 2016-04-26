@@ -1,60 +1,57 @@
 #include "stm32f0xx.h"
+#include "main.h"
 
-void RTC_IRQHandler(void)
-{
-    int i = 0;
-    if ((RTC->ISR & (RTC_ISR_ALRAF)) == (RTC_ISR_ALRAF))
-    {
+void RTC_IRQHandler(void) {
+    int i;
+    if ((RTC->ISR & RTC_ISR_ALRAF) == RTC_ISR_ALRAF ) {
+        // clear interrupt flags
         RTC->ISR &= ~RTC_ISR_ALRAF;
         EXTI->PR |= EXTI_PR_PR17;
         
-        if (((GPIOB->ODR & GPIO_ODR_3) == GPIO_ODR_3) & ((GPIOB->ODR & GPIO_ODR_4) == GPIO_ODR_4))
-        {
+        // tick
+        if (((GPIOB->ODR & GPIO_ODR_3) == GPIO_ODR_3) & ((GPIOB->ODR & GPIO_ODR_4) == GPIO_ODR_4)) {
             GPIOB->ODR &= ~GPIO_ODR_3;
-            for (i = 0; i <= 10000; i++ ) { __NOP(); };
+            for (i = 0; i <= 10000; i++) { __NOP(); };
             GPIOB->ODR &= ~GPIO_ODR_4;
-        }
-        else
-        {
+        } else {
             GPIOB->ODR |= GPIO_ODR_3;
-            for (i = 0; i <= 10000; i++ ) { __NOP(); };
+            for (i = 0; i <= 10000; i++) { __NOP(); };
             GPIOB->ODR |= GPIO_ODR_4;
         }
     }
 }
 
 int main() {
-    RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOBEN;
+    int i, j;
     
+    // disable backup domain protection
     RCC->APB1ENR |= RCC_APB1ENR_PWREN;
-    
     PWR->CR |= PWR_CR_DBP;
-    
     RCC->APB1ENR &= ~RCC_APB1ENR_PWREN;
-    
+
+    // enable low frequency oscillator
     RCC->BDCR |= RCC_BDCR_RTCEN | RCC_BDCR_LSEON | RCC_BDCR_RTCSEL_0;
-    
     while ((RCC->BDCR & RCC_BDCR_LSERDY) != RCC_BDCR_LSERDY) {}; 
     
+    // set alarm every second
     RTC->WPR = 0xCA;
     RTC->WPR = 0x53;
     RTC->CR &=~ RTC_CR_ALRAE;
     while ((RTC->ISR & RTC_ISR_ALRAWF) != RTC_ISR_ALRAWF) {};
-        
     RTC->ALRMAR |= RTC_ALRMAR_MSK4 | RTC_ALRMAR_MSK3 | RTC_ALRMAR_MSK2 | RTC_ALRMAR_MSK1;
-        
     RTC->CR = RTC_CR_ALRAIE | RTC_CR_ALRAE;
-        
     RTC->WPR = 0xFE;
     RTC->WPR = 0x64;
-  
+
+    // enable alarm interrupt
     EXTI->IMR |= EXTI_IMR_MR17;
-    
     EXTI->RTSR |= EXTI_RTSR_TR17;
-    
     NVIC_SetPriority(RTC_IRQn, 0);
     NVIC_EnableIRQ(RTC_IRQn);
-    
+
+    // enable gpio peripheria
+    RCC->AHBENR |= RCC_AHBENR_GPIOAEN | RCC_AHBENR_GPIOBEN;
+
     // 7-segment led anodes (PA0-PA7)
     GPIOA->MODER |=
         GPIO_MODER_MODER0_0
@@ -84,8 +81,7 @@ int main() {
         | GPIO_ODR_12;
         
     // led (PB13)
-    GPIOB->MODER |=
-        GPIO_MODER_MODER13_0;
+    GPIOB->MODER |= GPIO_MODER_MODER13_0;
         
     // buttons (PA8-PA11)
     GPIOA->MODER &= ~(
@@ -107,5 +103,14 @@ int main() {
 
     __enable_irq();
     
-    while(1) {};
+    while (1) {
+        for (i = 0; i <= 5; i++) {
+            GPIOB->ODR |= digit_all;
+            GPIOB->ODR &= ~digits[i];
+            for (j = 0; j <= 9; j++) {
+                GPIOA->ODR &= ~number_all;
+                GPIOA->ODR |= numbers[j];
+            }
+        }
+    };
 }
