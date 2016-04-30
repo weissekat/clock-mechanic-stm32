@@ -14,9 +14,7 @@ void Buttons_Initialize() {
         | GPIO_MODER_MODER15);
         
     GPIOA->PUPDR |=
-        GPIO_PUPDR_PUPDR8_0
-        | GPIO_PUPDR_PUPDR9_0
-        | GPIO_PUPDR_PUPDR10_0
+        GPIO_PUPDR_PUPDR10_0
         | GPIO_PUPDR_PUPDR11_0
         | GPIO_PUPDR_PUPDR15_0;
 

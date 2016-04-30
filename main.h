@@ -21,6 +21,17 @@
 #define number_8 (segment_a | segment_b | segment_c | segment_d | segment_e | segment_f | segment_g)
 #define number_9 (segment_a | segment_b | segment_c | segment_d | segment_f | segment_g)
 
+#define number_0_dot (segment_a | segment_b | segment_c | segment_d | segment_e | segment_f | segment_dot)
+#define number_1_dot (segment_b | segment_c | segment_dot)
+#define number_2_dot (segment_a | segment_b | segment_d | segment_e | segment_g | segment_dot)
+#define number_3_dot (segment_a | segment_b | segment_c | segment_d | segment_g | segment_dot)
+#define number_4_dot (segment_b | segment_c | segment_f | segment_g | segment_dot)
+#define number_5_dot (segment_a | segment_c | segment_d | segment_f | segment_g | segment_dot)
+#define number_6_dot (segment_a | segment_c | segment_d | segment_e | segment_f | segment_g | segment_dot)
+#define number_7_dot (segment_a | segment_b | segment_c | segment_dot | segment_dot)
+#define number_8_dot (segment_a | segment_b | segment_c | segment_d | segment_e | segment_f | segment_g | segment_dot)
+#define number_9_dot (segment_a | segment_b | segment_c | segment_d | segment_f | segment_g | segment_dot)
+
 #define number_all (segment_a | segment_b | segment_c | segment_d | segment_e | segment_f | segment_g | segment_dot)
 #define number_none ((uint16_t) 0)
 
@@ -32,7 +43,9 @@
 #define digit_5 (GPIO_ODR_12)
 #define digit_all (digit_0 | digit_1 | digit_2 | digit_3 | digit_4 | digit_5)
 
-uint16_t numbers[] = {number_0, number_1, number_2, number_3, number_4, number_5, number_6, number_7, number_8, number_9, number_none};
+uint16_t numbers[] = {number_0, number_1, number_2, number_3, number_4, number_5, number_6, number_7, number_8, number_9, number_none,
+      number_0_dot, number_1_dot, number_2_dot, number_3_dot, number_4_dot, number_5_dot, number_6_dot, number_7_dot, number_8_dot, number_9_dot};
+
 uint16_t digits[] = {digit_0, digit_1, digit_2, digit_3, digit_4, digit_5};
     
 #endif

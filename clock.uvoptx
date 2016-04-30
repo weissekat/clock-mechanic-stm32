@@ -159,7 +159,6 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>DLGUARM</Key>
-          <Name></Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -203,6 +202,11 @@
           <count>2</count>
           <WinNumber>1</WinNumber>
           <ItemText>minutes_and_seconds</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>hours</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>

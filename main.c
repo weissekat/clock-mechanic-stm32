@@ -6,9 +6,6 @@
 #include "driver.h"
 #include "timer.h"
 
-//volatile uint16_t upper_num = 8;
-volatile uint16_t lower_num = 0;
-
 volatile uint16_t timer_value = 0;
 
 void RTC_IRQHandler(void) {
@@ -47,35 +44,25 @@ void TIM14_IRQHandler(void) {
 }
 
 void TIM3_IRQHandler(void) {
-    uint8_t i, digit_value[6] = {10, 10, 10, 10, 10, 10};
+    uint8_t i;
+    uint8_t digit_value[6] = {10, 10, 10, 10, 10, 10};
 
-    uint16_t hours, minutes_and_seconds, minutes;
+    uint16_t hours = timer_value / 3600;
+    uint16_t minutes = timer_value % 3600 / 60;
 
-    // timer
-    uint8_t timer_dot;
-    hours = timer_value / 3600;
-    minutes_and_seconds = timer_value % 3600;
-    minutes = minutes_and_seconds / 60;
+    uint8_t timer_enabled = (GPIOA->IDR & GPIO_IDR_15) != GPIO_IDR_15;
+    uint8_t dot = timer_enabled && timer_value % 2;
 
+    // scale time
     if (hours > 9) {
-        digit_value[0] = hours / 10;
-        digit_value[1] = hours % 10;
-        digit_value[2] = minutes % 10;
-        timer_dot = 1;
+        digit_value[0] = (hours / 10) + 1;
+        digit_value[1] = hours % 10 + 10; // dot
+        digit_value[2] = minutes % 10 + dot * 11;
     } else {
-        digit_value[0] = hours;
+        digit_value[0] = (hours + 10) + 1; // dot
         digit_value[1] = minutes / 10;
-        digit_value[2] = minutes % 10;
-        timer_dot = 0;
+        digit_value[2] = minutes % 10 + dot * 11;
     }
-
-    // digit_value[0] = upper_num / 100;
-    // digit_value[1] = upper_num % 100 / 10;
-    // digit_value[2] = upper_num % 10;
-
-    // digit_value[3] = lower_num / 100;
-    // digit_value[4] = lower_num % 100 / 10;
-    // digit_value[5] = lower_num % 10;
 
     // clear interrupt flag
     TIM3->SR &= ~TIM_SR_UIF;
@@ -84,7 +71,6 @@ void TIM3_IRQHandler(void) {
     for (i = 0; i <= 5; i++) {
         GPIOB->ODR |= digit_all;
         GPIOA->ODR &= ~number_all;
-
         GPIOB->ODR &= ~digits[i];
         GPIOA->ODR |= numbers[digit_value[i]];
     }
@@ -99,17 +85,13 @@ void TIM16_IRQHandler(void) {
 
     // if switch up
     if ((GPIOA->IDR & GPIO_IDR_15) != GPIO_IDR_15) {
-        // countdown
         if (timer_value > 0) {
-            // tick
             timer_value--;
         } else {
-            // beep
-            GPIOA->ODR &= ~GPIO_ODR_12;
+            GPIOA->ODR &= ~GPIO_ODR_12; // beep
         }
     } else {
-        // lock beep
-        GPIOA->ODR |= GPIO_ODR_12;
+        GPIOA->ODR |= GPIO_ODR_12; // lock beep
     }
 }
 
@@ -118,19 +100,17 @@ void EXTI4_15_IRQHandler(void) {
         EXTI->PR |= EXTI_PR_PR8;
         if (timer_value >= 60)
             timer_value -= 60;
-        else
-            timer_value = 0;
     }
 
     if ((EXTI->PR & EXTI_PR_PR9) == EXTI_PR_PR9) {
         EXTI->PR |= EXTI_PR_PR9;
-        if (timer_value < 14400)
+        if (timer_value <= 35940)
             timer_value += 60;
-        else
-            timer_value = 0;
     }
 
-    // debounce
+    // truncate timer_value to least minute
+    if ((timer_value % 60) != 0)
+        timer_value = timer_value - (timer_value % 60);
 }
 
 int main() {
