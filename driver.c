@@ -8,10 +8,10 @@ void Driver_Initialize() {
     // driver
     GPIOB->MODER |= GPIO_MODER_MODER3_0 | GPIO_MODER_MODER4_0;
 
-    // enable timer 14 for driver delay ( 8 MHz / 400 / 200 = 100 Hz ~ 10 ms )
+    // enable timer 14 for driver delay ( 8 MHz / 400 / 400 = 50 Hz ~ 20 ms )
     RCC->APB1ENR |= RCC_APB1ENR_TIM14EN;
     TIM14->PSC = 400 - 1;
-    TIM14->ARR = 200;
+    TIM14->ARR = 400;
     TIM14->DIER |= TIM_DIER_UIE;
     NVIC_EnableIRQ(TIM14_IRQn);
 

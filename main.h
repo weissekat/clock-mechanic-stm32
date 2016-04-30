@@ -20,7 +20,9 @@
 #define number_7 (segment_a | segment_b | segment_c)
 #define number_8 (segment_a | segment_b | segment_c | segment_d | segment_e | segment_f | segment_g)
 #define number_9 (segment_a | segment_b | segment_c | segment_d | segment_f | segment_g)
-#define number_all (segment_a | segment_b | segment_c | segment_d | segment_e | segment_f | segment_g)
+
+#define number_all (segment_a | segment_b | segment_c | segment_d | segment_e | segment_f | segment_g | segment_dot)
+#define number_none ((uint16_t) 0)
 
 #define digit_0 (GPIO_ODR_0)
 #define digit_1 (GPIO_ODR_1)
@@ -30,7 +32,7 @@
 #define digit_5 (GPIO_ODR_12)
 #define digit_all (digit_0 | digit_1 | digit_2 | digit_3 | digit_4 | digit_5)
 
-uint16_t numbers[] = {number_0, number_1, number_2, number_3, number_4, number_5, number_6, number_7, number_8, number_9};
+uint16_t numbers[] = {number_0, number_1, number_2, number_3, number_4, number_5, number_6, number_7, number_8, number_9, number_none};
 uint16_t digits[] = {digit_0, digit_1, digit_2, digit_3, digit_4, digit_5};
     
 #endif
