@@ -25,6 +25,7 @@ void Leds_Initialize () {
         | GPIO_MODER_MODER11_0
         | GPIO_MODER_MODER12_0;
         
+    // turn off cathodes
     GPIOB->ODR |=
         GPIO_ODR_0
         | GPIO_ODR_1
@@ -35,4 +36,12 @@ void Leds_Initialize () {
         
     // led (PB13)
     GPIOB->MODER |= GPIO_MODER_MODER13_0;
+
+    // enable timer 3 for dynamic indication ( 8 MHz / 400 = 200 KHz )
+    RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+    TIM3->PSC = 0;
+    TIM3->ARR = 400;
+    TIM3->DIER |= TIM_DIER_UIE;
+    TIM3->CR1 |= TIM_CR1_CEN;
+    NVIC_EnableIRQ(TIM3_IRQn);
 }
