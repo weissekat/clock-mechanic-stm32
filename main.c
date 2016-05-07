@@ -28,19 +28,21 @@ void RTC_IRQHandler(void) {
 }
 
 void TIM14_IRQHandler(void) {
-    // clear interrupt flag
-    TIM14->SR &= ~TIM_SR_UIF;
+    if ((TIM14->SR & TIM_SR_UIF) == TIM_SR_UIF) {
+        // clear interrupt flag
+        TIM14->SR &= ~TIM_SR_UIF;
 
-    // disable driver
-    if (((GPIOB->ODR & GPIO_ODR_3) == GPIO_ODR_3) && ((GPIOB->ODR & GPIO_ODR_4) != GPIO_ODR_4)) {
-        GPIOB->ODR |= GPIO_ODR_4;
-    }
-    if (((GPIOB->ODR & GPIO_ODR_3) != GPIO_ODR_3) && ((GPIOB->ODR & GPIO_ODR_4) == GPIO_ODR_4)) {
-        GPIOB->ODR &= ~GPIO_ODR_4;
-    }
+        // disable driver
+        if (((GPIOB->ODR & GPIO_ODR_3) == GPIO_ODR_3) && ((GPIOB->ODR & GPIO_ODR_4) != GPIO_ODR_4)) {
+            GPIOB->ODR |= GPIO_ODR_4;
+        }
+        if (((GPIOB->ODR & GPIO_ODR_3) != GPIO_ODR_3) && ((GPIOB->ODR & GPIO_ODR_4) == GPIO_ODR_4)) {
+            GPIOB->ODR &= ~GPIO_ODR_4;
+        }
 
-    // disable driver delay timer
-    TIM14->CR1 &= ~TIM_CR1_CEN;
+        // disable driver delay timer
+        TIM14->CR1 &= ~TIM_CR1_CEN;
+    }
 }
 
 void TIM3_IRQHandler(void) {
